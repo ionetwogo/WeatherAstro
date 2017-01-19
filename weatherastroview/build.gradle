@@ -26,7 +26,7 @@ android {
 // 项目引用的版本号，比如compile 'com.yanzhenjie:andserver:1.0.1'中的1.0.1就是这里配置的。
 version = "1.0.1"
 // 唯一包名，比如compile 'com.yanzhenjie:andserver:1.0.1'中的com.yanzhenjie就是这里配置的。
-group = "com.doublecc.weatherastroview"
+group = "com.doublecc"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -69,7 +69,7 @@ bintray {
         name = 'weatherastroview'
 
         version {
-            name = '1.0.1-release'
+            name = '1.0.1'
             desc = "package简介"
             vcsTag = '1.0.1'
         }
@@ -77,8 +77,9 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'git@github.com:ionetwogo/WeatherAstro.git'
         websiteUrl = 'https://github.com/ionetwogo/WeatherAstro'
+
+        publish = true // 是否是公开项目
     }
 
     configurations = ['archives']
-
 }
