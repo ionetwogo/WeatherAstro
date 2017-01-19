@@ -23,16 +23,16 @@ import java.util.Calendar;
  */
 
 public class WeatherAstroView extends View {
-    // 风速
+    // windspeed
     private String windSpeed = "11";
-    // 风向
+    // winddir
     private String windDir = "东风";
-    // 日出日落，格式如：07:00 17:50
+    // sunrise sunset：07:00 17:50
     private String sunrise = "07:50";
     private String sunset = "17:50";
-    // 气压（hpa）
+    // pressure（hpa）
     private String pressure = "1024";
-    // 风车转速和风速关联开关
+    // windspeed relation
     private boolean openRelation = true;
 
     private int viewColor;
@@ -43,13 +43,13 @@ public class WeatherAstroView extends View {
     private final DashPathEffect dashPathEffect;
     private Path sunPath = new Path();
     private RectF sunRectF = new RectF();
-    private Path fanPath = new Path();// 旋转的风扇的扇叶
-    private Path fanPillarPath = new Path();// 旋转的风扇的柱子
+    private Path fanPath = new Path();
+    private Path fanPillarPath = new Path();
     private float fanPillerHeight;
     private final TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private float paintTextOffset;
     final float offsetDegree = 15f;
-    private float curRotate;// 旋转的风扇的角度
+    private float curRotate;
     private float sunArcHeight, sunArcRadius;
     private Rect visibleRect = new Rect();
 
@@ -87,7 +87,7 @@ public class WeatherAstroView extends View {
         try {
             paint.setStrokeWidth(density);
             paint.setStyle(Paint.Style.STROKE);
-            // 画出太阳路径
+            // sunpath
             paint.setColor(sunPathColor);
 
             paint.setPathEffect(dashPathEffect);
@@ -96,13 +96,13 @@ public class WeatherAstroView extends View {
             paint.setColor(viewColor);
             int saveCount = canvas.save();
             canvas.translate(width / 2f - fanPillerHeight * 1f, textSize + sunArcHeight - fanPillerHeight);
-            // 风速及风向文本
+            // windtext
             paint.setStyle(Paint.Style.FILL);
             paint.setTextAlign(Paint.Align.LEFT);
             final float fanHeight = textSize * 2f;
             canvas.drawText("风速", fanHeight + textSize, -textSize, paint);
             canvas.drawText(windSpeed + "km/h " + windDir, fanHeight + textSize, 0, paint);
-            // 画出风车
+            // windmill
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawPath(fanPillarPath, paint);
             canvas.rotate(curRotate * 360f);
@@ -112,7 +112,7 @@ public class WeatherAstroView extends View {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // 风车转速调节
+            // relation
             if (openRelation){
                 speed = Math.max(speed, 0.75f);
             }else{
@@ -148,29 +148,29 @@ public class WeatherAstroView extends View {
         }
 
         try {
-            // 画太阳
-            String[] sr = sunrise.split(":");// 日出
-            int srTime = Integer.valueOf(sr[0]) * 60 * 60 + Integer.valueOf(sr[1]) * 60 + 0;// 精确到秒
-            String[] ss = sunset.split(":");// 日落
+            // sun
+            String[] sr = sunrise.split(":");
+            int srTime = Integer.valueOf(sr[0]) * 60 * 60 + Integer.valueOf(sr[1]) * 60 + 0;
+            String[] ss = sunset.split(":");
             int ssTime = Integer.valueOf(ss[0]) * 60 * 60 + Integer.valueOf(ss[1]) * 60 + 0;
             Calendar c = Calendar.getInstance();
             int curTime = c.get(Calendar.HOUR_OF_DAY) * 60 * 60 + c.get(Calendar.MINUTE) * 60 + c.get(Calendar.MINUTE);
-            if (curTime >= srTime && curTime <= ssTime) {// 说明是在白天，需要画太阳
+            if (curTime >= srTime && curTime <= ssTime) {
                 canvas.save();
-                canvas.translate(width / 2f, sunArcRadius + textSize);// 先平移到圆心
+                canvas.translate(width / 2f, sunArcRadius + textSize);
                 float percent = (curTime - srTime) / ((float) (ssTime - srTime));
                 float degree = 15f + 150f * percent;
                 final float sunRadius = density * 4f;
-                canvas.rotate(degree);// 旋转到太阳的角度
+                canvas.rotate(degree);
 
                 paint.setStyle(Paint.Style.FILL);
-                paint.setStrokeWidth(density * 1.333f);// 宽度是2对应半径是6
-                canvas.translate(-sunArcRadius, 0);// 平移到太阳应该在的位置
-                canvas.rotate(-degree);// 转正方向。。。
+                paint.setStrokeWidth(density * 1.333f);
+                canvas.translate(-sunArcRadius, 0);
+                canvas.rotate(-degree);
                 canvas.drawCircle(0, 0, sunRadius, paint);
                 paint.setStyle(Paint.Style.STROKE);
                 final int light_count = 8;
-                for (int i = 0; i < light_count; i++) {// 画刻度
+                for (int i = 0; i < light_count; i++) {
                     double radians = Math.toRadians(i * (360 / light_count));
                     float x1 = (float) (Math.cos(radians) * sunRadius * 1.6f);
                     float y1 = (float) (Math.sin(radians) * sunRadius * 1.6f);
@@ -197,8 +197,7 @@ public class WeatherAstroView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        // 间距1 图8.5行 间距0.5 字1行 间距1 = 12;
-        // 9.5 10 11 12
+
         this.width = w;
         this.height = h;
 
@@ -216,15 +215,14 @@ public class WeatherAstroView extends View {
             sunRectF.top = textSize;
             sunRectF.right = width - sunArcLeft;
             sunRectF.bottom = sunArcRadius * 2f + textSize;
-            sunPath.addArc(sunRectF, -165, +150);// 圆形的最右端点为0，顺时针sweepAngle
+            sunPath.addArc(sunRectF, -165, +150);
 
-            // fanPath和fanPillarPath的中心点在扇叶圆形的中间
+
             fanPath.reset();
-            final float fanSize = textSize * 0.2f;// 风扇底部半圆的半径
+            final float fanSize = textSize * 0.2f;
             final float fanHeight = textSize * 2f;
             final float fanCenterOffsetY = fanSize * 1.6f;
-            // 也可以用arcTo
-            // 从右边到底部到左边了的弧
+
             fanPath.addArc(new RectF(-fanSize, -fanSize - fanCenterOffsetY, fanSize, fanSize - fanCenterOffsetY), 0,
                     180);
             fanPath.quadTo(-fanSize * 1f, -fanHeight * 0.5f - fanCenterOffsetY, 0, -fanHeight - fanCenterOffsetY);
@@ -232,9 +230,9 @@ public class WeatherAstroView extends View {
             fanPath.close();
 
             fanPillarPath.reset();
-            final float fanPillarSize = textSize * 0.25f;// 柱子的宽度
+            final float fanPillarSize = textSize * 0.25f;
             fanPillarPath.moveTo(0, 0);
-            fanPillerHeight = textSize * 4f;// 柱子的宽度
+            fanPillerHeight = textSize * 4f;
             fanPillarPath.lineTo(fanPillarSize, fanPillerHeight);
             fanPillarPath.lineTo(-fanPillarSize, fanPillerHeight);
             fanPillarPath.close();
@@ -246,7 +244,7 @@ public class WeatherAstroView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec,
                              int heightMeasureSpec) {
-        // 默认宽高（dp）
+
         setMeasuredDimension(
                 measureDimension(dp2px(350),widthMeasureSpec),
                 measureDimension(dp2px(144),heightMeasureSpec));
